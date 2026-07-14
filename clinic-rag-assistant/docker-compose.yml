@@ -1,0 +1,69 @@
+# clinic-rag-assistant ローカル開発環境
+# app(Laravel) / queue(取り込みワーカー) / postgres(pgvector) / redis / node(Vite)
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - PHP_CLI_SERVER_WORKERS=4
+    # public/index.php をドキュメントルートとして内蔵サーバを起動
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  # 文書取り込み等の非同期ジョブを処理するキューワーカー
+  queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: php artisan queue:work --tries=3 --timeout=120
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: clinic_rag
+      POSTGRES_USER: clinic
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic -d clinic_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      # ホスト側 6379 が競合する環境向けに 6380 で公開(コンテナ内部は 6379)
+      - "6380:6379"
+
+  # フロントエンド(Vue 3 + Vite)開発サーバ
+  node:
+    image: node:20-alpine
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  pgdata:
