@@ -7,9 +7,11 @@ use App\Services\Contracts\LlmClient;
 use App\Services\Ingest\ChunkSplitter;
 use App\Services\Ingest\TokenCounter;
 use App\Services\Rag\Embedding\FakeEmbeddingClient;
+use App\Services\Rag\Embedding\OllamaEmbeddingClient;
 use App\Services\Rag\Embedding\VoyageEmbeddingClient;
 use App\Services\Rag\Llm\AnthropicLlmClient;
 use App\Services\Rag\Llm\FakeLlmClient;
+use App\Services\Rag\Llm\OllamaLlmClient;
 use Illuminate\Support\ServiceProvider;
 
 // RAG 関連の依存を config('rag') のドライバ設定に応じてバインドする。
@@ -30,6 +32,14 @@ class RagServiceProvider extends ServiceProvider
                 );
             }
 
+            if (($cfg['driver'] ?? 'voyage') === 'ollama') {
+                return new OllamaEmbeddingClient(
+                    baseUrl: (string) $cfg['ollama']['base_url'],
+                    model: (string) $cfg['ollama']['model'],
+                    dimensions: $dimensions,
+                );
+            }
+
             return new VoyageEmbeddingClient(
                 apiKey: (string) $cfg['api_key'],
                 model: (string) $cfg['model'],
@@ -45,6 +55,14 @@ class RagServiceProvider extends ServiceProvider
             if (($cfg['driver'] ?? 'anthropic') === 'fake') {
                 return new FakeLlmClient(
                     latencyMs: (int) config('rag.fake.llm_latency_ms', 0),
+                );
+            }
+
+            if (($cfg['driver'] ?? 'anthropic') === 'ollama') {
+                return new OllamaLlmClient(
+                    baseUrl: (string) $cfg['ollama']['base_url'],
+                    model: (string) $cfg['ollama']['model'],
+                    maxTokens: (int) $cfg['max_tokens'],
                 );
             }
 

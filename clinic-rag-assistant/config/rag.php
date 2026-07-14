@@ -14,15 +14,21 @@ return [
     'judge_prompt_version' => env('RAG_JUDGE_PROMPT_VERSION', 'v1'),
 
     // --- LLM(回答生成)---
+    // driver: anthropic(実API) / ollama(ローカル・無料) / fake(擬似)
     'llm' => [
         'driver' => env('LLM_DRIVER', 'anthropic'),
         'api_key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
         'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
         'max_tokens' => (int) env('ANTHROPIC_MAX_TOKENS', 1024),
+        'ollama' => [
+            'base_url' => env('OLLAMA_BASE_URL', 'http://host.docker.internal:11434'),
+            'model' => env('OLLAMA_LLM_MODEL', 'qwen2.5:7b'),
+        ],
     ],
 
     // --- Embedding ---
+    // driver: voyage(実API) / ollama(ローカル・無料) / fake(擬似)
     'embedding' => [
         'driver' => env('EMBEDDING_DRIVER', 'voyage'),
         'api_key' => env('EMBEDDING_API_KEY'),
@@ -30,6 +36,11 @@ return [
         'base_url' => env('EMBEDDING_BASE_URL', 'https://api.voyageai.com/v1'),
         // DB の vector(N) と一致させること。変更時はマイグレーションの見直しが必要。
         'dimensions' => (int) env('EMBEDDING_DIMENSIONS', 1024),
+        'ollama' => [
+            'base_url' => env('OLLAMA_BASE_URL', 'http://host.docker.internal:11434'),
+            // 1024次元のモデルを指定すること(bge-m3 / mxbai-embed-large 等)
+            'model' => env('OLLAMA_EMBEDDING_MODEL', 'bge-m3'),
+        ],
     ],
 
     // --- キャッシュ戦略(ADR-004)---

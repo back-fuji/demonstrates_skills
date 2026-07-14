@@ -76,8 +76,24 @@ docker compose run --rm node npm run build               # フロントSPAをビ
 # デモアカウント: admin@example.com / staff@example.com(いずれも password="password")
 ```
 
-実APIで動かす場合は `.env` で `LLM_DRIVER=anthropic` / `EMBEDDING_DRIVER=voyage` に変更し、
-`ANTHROPIC_API_KEY` / `EMBEDDING_API_KEY` を設定する。
+### 本物のAI回答を出す(2通り)
+
+回答ドライバは3種類(`fake` / `anthropic` / `ollama`)を `.env` で切替可能。
+
+**A. ローカルLLM(Ollama・無料・オフライン)** — 課金なしで本物の日本語回答を出す:
+```bash
+brew install ollama && ollama serve            # Mac にネイティブ導入(GPU利用)
+ollama pull qwen2.5:7b && ollama pull bge-m3    # 回答用 + 埋め込み(1024次元)
+# .env を切替
+#   LLM_DRIVER=ollama / EMBEDDING_DRIVER=ollama
+docker compose run --rm app php artisan migrate:fresh --seed   # ollamaの埋め込みで作り直す
+```
+DockerコンテナからはMac上のOllamaに `host.docker.internal:11434` で接続します。
+
+**B. 実API(最高品質・従量課金)**:
+`.env` で `LLM_DRIVER=anthropic` / `EMBEDDING_DRIVER=voyage` に変更し、
+`ANTHROPIC_API_KEY`(platform.claude.com)/ `EMBEDDING_API_KEY`(voyageai.com)を設定。
+※ Anthropic API は Claude Pro サブスクとは別課金です。
 
 ## 性能改善の実測(before / after)
 
