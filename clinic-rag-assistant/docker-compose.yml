@@ -17,6 +17,9 @@ services:
     environment:
       # 内蔵サーバの同時処理ワーカー数(負荷試験の同時実行を現実的にするため増やす)
       - PHP_CLI_SERVER_WORKERS=16
+    # ホスト上の Ollama(localhost:11434)へ host.docker.internal で接続できるようにする
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # public/index.php をドキュメントルートとして内蔵サーバを起動
     command: php artisan serve --host=0.0.0.0 --port=8000
 
@@ -32,6 +35,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: php artisan queue:work --tries=3 --timeout=120
 
   postgres:
