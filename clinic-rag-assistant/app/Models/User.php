@@ -21,7 +21,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
+
+    public const ROLE_STAFF = 'staff';
+    public const ROLE_ADMIN = 'admin';
+
+    // 文書管理API等の管理者専用操作の判定に使う。
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

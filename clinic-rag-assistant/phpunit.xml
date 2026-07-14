@@ -22,8 +22,19 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <!-- <env name="DB_CONNECTION" value="sqlite"/> -->
-        <!-- <env name="DB_DATABASE" value=":memory:"/> -->
+        <!-- テストは pgvector を使うため PostgreSQL のテスト専用DBを使用 -->
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_HOST" value="postgres"/>
+        <env name="DB_PORT" value="5432"/>
+        <env name="DB_DATABASE" value="clinic_rag_test"/>
+        <env name="DB_USERNAME" value="clinic"/>
+        <env name="DB_PASSWORD" value="secret"/>
+        <!-- 外部APIは呼ばない(Fake実装に差し替え) -->
+        <env name="LLM_DRIVER" value="fake"/>
+        <env name="EMBEDDING_DRIVER" value="fake"/>
+        <env name="EMBEDDING_DIMENSIONS" value="1024"/>
+        <env name="FAKE_LLM_LATENCY_MS" value="0"/>
+        <env name="FAKE_EMBEDDING_LATENCY_MS" value="0"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

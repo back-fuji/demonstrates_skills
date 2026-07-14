@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // staff / admin(admin のみ文書管理APIを利用可能)
+            $table->string('role', 20)->default('staff');
             $table->rememberToken();
             $table->timestamps();
         });
