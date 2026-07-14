@@ -1,0 +1,6 @@
+question: "医療脱毛の全身1回の料金はいくらですか?"
+category: fact
+expected_chunk_keys:
+  - "医療脱毛 施術マニュアル#料金"
+expected_answer_points:
+  - "全身1回は33,000円(税込)"

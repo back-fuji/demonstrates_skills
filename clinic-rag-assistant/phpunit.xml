@@ -33,6 +33,8 @@
         <env name="LLM_DRIVER" value="fake"/>
         <env name="EMBEDDING_DRIVER" value="fake"/>
         <env name="EMBEDDING_DIMENSIONS" value="1024"/>
+        <!-- テストリクエスト(host=localhost)を Sanctum のステートフル扱いにする -->
+        <env name="SANCTUM_STATEFUL_DOMAINS" value="localhost"/>
         <env name="FAKE_LLM_LATENCY_MS" value="0"/>
         <env name="FAKE_EMBEDDING_LATENCY_MS" value="0"/>
         <env name="MAIL_MAILER" value="array"/>

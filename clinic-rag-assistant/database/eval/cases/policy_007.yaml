@@ -1,0 +1,7 @@
+question: "施術後、湯船やサウナの入浴はいつからできますか?"
+category: policy
+expected_chunk_keys:
+  - "術後の飲酒・入浴・運動FAQ#入浴"
+expected_answer_points:
+  - "湯船・サウナは当日〜48時間は避けるのが基本(施術により異なる)"
+  - "当日はシャワーのみで熱いお湯を避ける"

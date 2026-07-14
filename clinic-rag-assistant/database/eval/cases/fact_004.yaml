@@ -1,0 +1,6 @@
+question: "ヒアルロン酸をほうれい線に入れる場合の料金は?"
+category: fact
+expected_chunk_keys:
+  - "ヒアルロン酸注入 施術マニュアル#料金"
+expected_answer_points:
+  - "ほうれい線は1mlあたり66,000円(税込)"

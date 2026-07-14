@@ -91,7 +91,8 @@ class ChunkSplitter
                 continue;
             }
 
-            if (! $inCodeBlock && preg_match('/^(#{1,6})\s+(.*\S)\s*$/', $line, $m)) {
+            // /u 必須(日本語見出しがバイト境界で切断されないように)
+            if (! $inCodeBlock && preg_match('/^(#{1,6})\s+(.*\S)\s*$/u', $line, $m)) {
                 $level = strlen($m[1]);
                 $title = trim($m[2]);
                 $hasAnyHeading = true;

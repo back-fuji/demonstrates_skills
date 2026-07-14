@@ -1,0 +1,6 @@
+question: "施術機器のメーカー保守契約の年間金額はいくらですか?"
+category: no_answer
+expected_chunk_keys: []
+expected_answer_points:
+  - "機器の保守契約金額は社内文書に存在しないため回答できないと伝える"
+  - "推測で金額を答えない"

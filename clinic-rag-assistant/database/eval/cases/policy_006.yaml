@@ -1,0 +1,7 @@
+question: "予約の変更はいつまで受け付けてもらえますか?"
+category: policy
+expected_chunk_keys:
+  - "遅刻・予約変更ルール#予約変更の締切"
+expected_answer_points:
+  - "前日の営業終了(20:00)まで"
+  - "当日の変更はキャンセル扱いになる場合がある"

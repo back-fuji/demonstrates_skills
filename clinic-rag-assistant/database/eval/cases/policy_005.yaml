@@ -1,0 +1,7 @@
+question: "ダーマペンの後、メイクはいつからできますか?"
+category: policy
+expected_chunk_keys:
+  - "術後のメイク・日焼け止めFAQ#メイク再開の目安"
+expected_answer_points:
+  - "ダーマペンは施術当日はメイク不可"
+  - "翌日から可能"

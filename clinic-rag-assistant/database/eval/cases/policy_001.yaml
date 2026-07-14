@@ -1,0 +1,8 @@
+question: "医療脱毛を当日キャンセルした場合のキャンセル料は?"
+category: policy
+expected_chunk_keys:
+  - "予約・キャンセルポリシー#当日キャンセル"
+expected_answer_points:
+  - "施術料金の50%が発生する"
+  - "無断キャンセルは100%"
+  - "体調不良の場合は前日までの連絡で免除"

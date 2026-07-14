@@ -12,7 +12,7 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -41,7 +41,31 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+// テスト用: 文書を作成し Fake embedding で取り込み(completed 状態)にする。
+function seedDocument(string $title, string $category, string $content): App\Models\Document
 {
-    // ..
+    $document = App\Models\Document::query()->create([
+        'title' => $title,
+        'category' => $category,
+        'content' => $content,
+        'status' => App\Models\Document::STATUS_PROCESSING,
+        'version' => 1,
+    ]);
+    app(App\Services\Ingest\DocumentIngestor::class)->ingest($document, 1);
+
+    return $document->refresh();
+}
+
+// SSE ストリームを event => data(配列) の連想に展開する。
+function parseSse(string $body): array
+{
+    $events = [];
+    foreach (explode("\n\n", trim($body)) as $frame) {
+        if (! preg_match('/event:\s*(\S+)\s*\ndata:\s*(.+)/s', $frame, $m)) {
+            continue;
+        }
+        $events[] = ['event' => $m[1], 'data' => json_decode(trim($m[2]), true)];
+    }
+
+    return $events;
 }

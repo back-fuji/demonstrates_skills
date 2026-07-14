@@ -1,0 +1,8 @@
+question: "ポテンツァを受けられない人(禁忌)は?"
+category: fact
+expected_chunk_keys:
+  - "ポテンツァ 施術マニュアル#禁忌・注意事項"
+expected_answer_points:
+  - "妊娠中"
+  - "ペースメーカー等の体内電子機器を使用中"
+  - "金属アレルギー・ケロイド体質・活動性の皮膚感染症"

@@ -1,0 +1,7 @@
+question: "未成年が施術を受けるには何が必要ですか?"
+category: policy
+expected_chunk_keys:
+  - "未成年・同意書ポリシー#未成年の施術"
+expected_answer_points:
+  - "18歳未満は原則、親権者の同伴または署名済み同意書が必要"
+  - "15歳未満は保護者の同伴が必須"

@@ -1,0 +1,8 @@
+question: "たるみ治療で、ハイフとポテンツァはどう違いますか?"
+category: comparison
+expected_chunk_keys:
+  - "ハイフ(HIFU)施術マニュアル#施術概要"
+  - "ポテンツァ 施術マニュアル#施術概要"
+expected_answer_points:
+  - "ハイフは超音波を筋膜(SMAS)層に集中させ引き締める"
+  - "ポテンツァは針で真皮に高周波の熱を加える"

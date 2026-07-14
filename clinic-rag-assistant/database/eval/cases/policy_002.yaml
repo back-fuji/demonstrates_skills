@@ -1,0 +1,7 @@
+question: "予約時間に遅刻したらどうなりますか?"
+category: policy
+expected_chunk_keys:
+  - "遅刻・予約変更ルール#遅刻時の対応"
+expected_answer_points:
+  - "10分以上の遅刻は施術内容の短縮・変更をお願いする場合がある"
+  - "15分以上の連絡なし遅刻は当日キャンセル(50%)扱い"
