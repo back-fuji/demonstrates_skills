@@ -29,3 +29,18 @@ HNSW(m=16, ef_construction=64)を採用する。
 - (+) 追加運用がシンプル、検索p95が安定
 - (−) メモリ使用量は増える(RDSインスタンスサイズ選定時に考慮)
 - 計測結果はdocs/06の結果テンプレートに追記し、必要ならStatusをSupersededに変更する
+
+## 実測(Phase 3, 合成1万チャンク・dim=1024・クラスタ構造データ)
+
+`php artisan bench:vector` による計測。詳細は docs/06 §8 Step 3。
+
+| index | 構築時間 | p95 | Recall@8 |
+|---|---|---|---|
+| なし(全件スキャン) | ~0 ms | 17.14 ms | 1.000 |
+| HNSW(m=16, ef_construction=64, ef_search=40) | 5,611 ms | **1.47 ms** | **0.998** |
+| IVFFlat(lists≈√n, probes=10) | 1,158 ms | 1.76 ms | 0.988 |
+
+- 1万件規模では全件スキャンでも p95≈17ms で成立(ADR-001 の「この規模ならインデックスなしでも成立しうる」を実証)。
+- HNSW は最良のRecall(0.998)を約12倍高速に達成。文書が継続追加される運用でも再構築不要。
+- IVFFlat は構築が速い(1.2s)がRecallがわずかに劣り、大量追加でクラスタが歪むと再構築が要る。
+- 以上より **Decision(HNSW採用)を実測で支持**。Status は Accepted のまま。

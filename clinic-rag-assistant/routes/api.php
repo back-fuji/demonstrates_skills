@@ -3,9 +3,23 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\LoadTestController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\SessionController;
 use Illuminate\Support\Facades\Route;
+
+// 負荷試験用エンドポイント(非本番のみ・認証なし)。k6 から実処理を計測する(docs/06)。
+if (! app()->isProduction()) {
+    Route::prefix('_loadtest')->group(function () {
+        Route::post('/search', [LoadTestController::class, 'search']);
+        Route::post('/retrieve', [LoadTestController::class, 'retrieve']);
+        Route::post('/warm', [LoadTestController::class, 'warm']);
+        Route::post('/expire-cache', [LoadTestController::class, 'expireCache']);
+        Route::post('/update-doc', [LoadTestController::class, 'updateDoc']);
+        Route::get('/metrics', [LoadTestController::class, 'metrics']);
+        Route::post('/reset-metrics', [LoadTestController::class, 'resetMetrics']);
+    });
+}
 
 // セッションを直接使う認証エンドポイント(SPA Cookie)。
 // Sanctum のフロントエンド判定(Origin/Referer)に依存せずセッションを開始する。

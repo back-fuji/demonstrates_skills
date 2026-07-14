@@ -39,8 +39,16 @@ class SearchService
             'content' => $question,
         ]);
 
-        // 1. キャッシュ確認(単純TTL、ADR-004)
-        if (($cached = $this->cache->get($question)) !== null) {
+        // 1. キャッシュ確認(ADR-004)。SWR有効時は stale ヒットも扱う。
+        $entry = $this->cache->getEntry($question);
+        if ($entry['payload'] !== null) {
+            $cached = $entry['payload'];
+
+            // stale(期限切れだが stale 値あり)なら裏で再生成をトリガ(ロックで1件に収束)
+            if ($entry['stale']) {
+                $this->triggerRevalidate($question);
+            }
+
             $onSources($cached['sources']);
             $latency = (int) round((microtime(true) - $start) * 1000);
             $message = $this->persistAssistant($session, $cached['answer'], $cached['sources'], $latency, cached: true);
@@ -95,6 +103,76 @@ class SearchService
         ]);
 
         return $this->result('answer', $message->id, false, $latency, $sources, $answer);
+    }
+
+    // セッション永続化を伴わない、キャッシュ/生成のみの経路(負荷試験 bench:stampede 用)。
+    // HTTP内蔵サーバの直列化を避け、複数プロセスで真の同時実行スタンピードを再現するために使う。
+    public function answerHeadless(string $question): string
+    {
+        $entry = $this->cache->getEntry($question);
+        if ($entry['payload'] !== null) {
+            if ($entry['stale']) {
+                $this->triggerRevalidate($question);
+            }
+
+            return 'cached';
+        }
+
+        $embedding = $this->embedder->embed($question);
+        $topK = (int) config('rag.top_k', 8);
+        $threshold = (float) config('rag.score_threshold', 0.5);
+        $hits = $this->chunks->search($embedding, $topK, $threshold);
+
+        if ($hits === []) {
+            $this->cache->put($question, ['answer' => (string) config('rag.no_answer_message'), 'sources' => [], 'model' => $this->generator->model()]);
+
+            return 'no_answer';
+        }
+
+        $answer = $this->generator->generate($question, $hits);
+        $this->cache->put($question, [
+            'answer' => $answer,
+            'sources' => $this->toSources($hits),
+            'model' => $this->generator->model(),
+        ]);
+
+        return 'answer';
+    }
+
+    // SWR: stale を返した後、裏でキャッシュを再生成する(ADR-004)。
+    // 再生成ロックを1件だけ取得できた場合のみジョブを投入し、生成処理を1件へ収束させる。
+    private function triggerRevalidate(string $question): void
+    {
+        $lock = $this->cache->acquireRegenLock($question);
+        if ($lock === null) {
+            return; // 別リクエストが既に再生成中
+        }
+        // ロックは owner トークンをジョブへ渡し、ジョブ完了時に解放する
+        \App\Jobs\RegenerateAnswerJob::dispatch($question, $lock->owner());
+    }
+
+    // キャッシュ再生成(ジョブから呼ばれる)。ストリーミング無しで生成しキャッシュへ保存。
+    public function regenerate(string $question): void
+    {
+        $queryEmbedding = $this->embedder->embed($question);
+        $topK = (int) config('rag.top_k', 8);
+        $threshold = (float) config('rag.score_threshold', 0.5);
+        $hits = $this->chunks->search($queryEmbedding, $topK, $threshold);
+
+        if ($hits === []) {
+            $noAnswer = (string) config('rag.no_answer_message');
+            $this->cache->put($question, ['answer' => $noAnswer, 'sources' => [], 'model' => $this->generator->model()]);
+
+            return;
+        }
+
+        $sources = $this->toSources($hits);
+        $answer = $this->generator->generate($question, $hits);
+        $this->cache->put($question, [
+            'answer' => $answer,
+            'sources' => $sources,
+            'model' => $this->generator->model(),
+        ]);
     }
 
     /**

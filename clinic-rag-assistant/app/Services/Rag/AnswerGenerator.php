@@ -3,6 +3,7 @@
 namespace App\Services\Rag;
 
 use App\Services\Contracts\LlmClient;
+use App\Support\Metrics;
 
 // 検索チャンクをコンテキストに Claude で回答を生成する(docs/02 §2.1 手順6)。
 // システムプロンプトは resources/prompts/answer_{version}.md で外部管理する。
@@ -21,6 +22,9 @@ class AnswerGenerator
     {
         $system = $this->prompts->load('answer', (string) config('rag.answer_prompt_version', 'v1'));
         $userPrompt = $this->buildUserPrompt($question, $chunks);
+
+        // LLM 生成回数(キャッシュ効果・スタンピード対策の直接指標、docs/06 §4)
+        Metrics::increment('llm_generate_calls');
 
         return $this->llm->generate($system, $userPrompt, $onToken);
     }

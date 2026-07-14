@@ -48,16 +48,66 @@ RAG(Retrieval-Augmented Generation)で根拠付きの回答を返します。
 
 | Phase | 内容 | 状態 |
 |---|---|---|
-| Phase 0 | 設計ドキュメント一式 | ✅ 完了(本リポジトリ) |
-| Phase 1 | RAG本体(文書取り込み・検索・回答生成・UI) | 🔲 実装中 |
-| Phase 2 | 評価ハーネス(ゴールデンセット・回帰テスト・CI) | 🔲 未着手 |
-| Phase 3 | 負荷試験と性能改善(k6・キャッシュ・インデックス比較) | 🔲 未着手 |
+| Phase 0 | 設計ドキュメント一式 | ✅ 完了 |
+| Phase 1 | RAG本体(文書取り込み・検索・回答生成・UI) | ✅ 完了 |
+| Phase 2 | 評価ハーネス(ゴールデンセット・回帰テスト・CI) | ✅ 完了 |
+| Phase 3 | 負荷試験と性能改善(k6・キャッシュ・インデックス比較) | ✅ 完了 |
 
-## ローカル起動(Phase 1完了後)
+## 実装ハイライト
+
+- **Laravel 11 + Vue 3 + PostgreSQL 16(pgvector)+ Redis** を Docker Compose で一括起動
+- 見出し構造ベースのチャンク分割(ADR-002)、HNSW ベクトル検索(ADR-003)、
+  引用元を先行送信する **SSE ストリーミング**回答、根拠なし時の **no_answer** 分岐
+- 外部API(Claude / embedding)は **interface + Fake/実API** で差し替え可能。
+  **既定は Fake のためAPIキー無しで即起動・全機能デモ可能**(実APIは `.env` で切替)
+- 評価ハーネス(`eval:run`): Recall@k(層1)+ LLM-as-a-Judge(層2)、前回run差分レポート、CIゲート
+- 負荷試験(k6 + `bench:*`): キャッシュ / SWR+ロック / HNSW-IVFFlat比較 / 楽観ロックの before/after 実測
+- テスト **25件**(ChunkSplitter単体・認証・取り込み・検索・楽観ロック・評価ハーネス)
+
+## ローカル起動(APIキー不要で即動作)
 
 ```bash
-docker compose up -d          # PostgreSQL(pgvector) + Redis + アプリ
-cp .env.example .env          # ANTHROPIC_API_KEY を設定
-php artisan migrate --seed    # ダミー文書の取り込み含む
-npm run dev
+docker compose up -d --build     # app / queue / postgres(pgvector) / redis / node
+cp .env.example .env             # 既定ドライバは fake(キー不要)
+docker compose run --rm app php artisan key:generate
+docker compose run --rm app php artisan migrate --seed   # ダミー文書30本を取り込み(completed)
+docker compose run --rm node npm run build               # フロントSPAをビルド(public/build)
+# SPA は http://localhost:8000 で確認可能
+# デモアカウント: admin@example.com / staff@example.com(いずれも password="password")
 ```
+
+実APIで動かす場合は `.env` で `LLM_DRIVER=anthropic` / `EMBEDDING_DRIVER=voyage` に変更し、
+`ANTHROPIC_API_KEY` / `EMBEDDING_API_KEY` を設定する。
+
+## 性能改善の実測(before / after)
+
+ローカル Docker Compose・フェイクLLM(固定2s)での相対改善(詳細: [docs/06 §8](./docs/06_load_testing.md)):
+
+| 対策 | before | after | 効果 |
+|---|---|---|---|
+| 回答キャッシュ(TTL) | 生成 2.39s | ヒット 0.24s(サーバ内 4ms) | 人気質問を約10倍高速化 |
+| SWR + 再生成ロック(ADR-004) | 同時失効で LLM生成 **50回** | **1回**に収束 | スタンピード解消・APIコスト削減 |
+| HNSW index(ADR-003) | 全件スキャン p95 17.1ms | HNSW p95 **1.47ms**(Recall 0.998) | 約12倍高速・高Recall |
+| 楽観ロック(ADR-005) | 10並列更新で不整合あり | **1成功 / 9×409・不整合ゼロ** | 編集消失・二重取り込み防止 |
+
+## 検証コマンド
+
+```bash
+# テスト(全機能・APIキー不要)
+docker compose run --rm app php artisan test
+
+# 評価ハーネス
+docker compose run --rm app php artisan eval:seed
+docker compose run --rm app php artisan eval:run --only=retrieval   # 層1のみ(高速)
+docker compose run --rm app php artisan eval:run                    # 層1+層2(Judge)
+
+# 負荷試験の再現
+docker compose run --rm app php artisan bench:stampede --concurrency=50   # スタンピード計測
+docker compose run --rm app php artisan bench:vector --index=hnsw --count=10000
+NET=clinic-rag-assistant_default
+docker run --rm --network $NET -v "$PWD/load:/load" grafana/k6 run /load/s4_ingest_contention.js \
+  -e BASE_URL=http://app:8000 -e DOC_ID=1 -e VERSION=1 -e VUS=10
+```
+
+> **スクリーンショット**: SPA(チャット・引用元カード・管理画面)は `docker compose up` 後に
+> http://localhost:8000 で確認できます。
