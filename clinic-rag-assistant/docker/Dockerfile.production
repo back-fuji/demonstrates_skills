@@ -1,0 +1,41 @@
+# 本番用イメージ(Railway 等の単一コンテナPaaS向け)
+# FrankenPHP(Caddy + PHP)で public/ を配信。フロント(Vite)ビルドを同梱。
+
+# ---- フロントエンド(Vue/Vite)ビルド ----
+FROM node:20-alpine AS assets
+WORKDIR /app
+COPY . .
+RUN npm ci || npm install
+RUN npm run build
+
+# ---- ランタイム(FrankenPHP)----
+FROM dunglas/frankenphp:1-php8.3
+
+# 必要なPHP拡張(pgsql / bcmath / opcache / zip)
+RUN install-php-extensions pdo_pgsql pgsql bcmath opcache zip
+
+# Composer を同梱
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+# アプリ本体をコピー(node_modules/vendor/.env 等は .dockerignore で除外)
+COPY . .
+# ビルド済みフロント資産を取り込む
+COPY --from=assets /app/public/build ./public/build
+
+# 本番依存のみインストール(脆弱性アドバイザリのブロックはポートフォリオ用途のため解除)
+RUN composer config --no-plugins policy.advisories.block false \
+	&& composer install --no-dev --optimize-autoloader --no-interaction
+
+# storage/ と bootstrap/cache への書き込み権限
+RUN chmod -R 775 storage bootstrap/cache
+
+ENV APP_ENV=production
+EXPOSE 8080
+
+COPY docker/railway-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["web"]

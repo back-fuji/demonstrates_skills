@@ -148,3 +148,9 @@ docker run --rm --network $NET -v "$PWD/load:/load" grafana/k6 run /load/s4_inge
 
 > **スクリーンショット**: SPA(チャット・引用元カード・管理画面)は `docker compose up` 後に
 > http://localhost:8000 で確認できます。
+
+## 公開デプロイ
+
+本番用イメージ(FrankenPHP + フロントビルド同梱)を用意しています(`docker/Dockerfile.production`)。
+Railway への手順は [docs/DEPLOY_RAILWAY.md](./docs/DEPLOY_RAILWAY.md) を参照。
+(web + worker + pgvector + Redis の4サービス、LLM/embeddingは実API)。
