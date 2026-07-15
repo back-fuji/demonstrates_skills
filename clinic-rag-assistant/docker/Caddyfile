@@ -1,0 +1,16 @@
+{
+	# FrankenPHP を有効化(Caddy + PHP)
+	frankenphp
+	# Railway 等では TLS はプラットフォーム側で終端するため無効化
+	auto_https off
+}
+
+# Railway は $PORT を注入する(未設定時は 8080)
+:{$PORT:8080} {
+	root * /app/public
+	encode gzip
+
+	# php_server は Laravel のフロントコントローラ(public/index.php)への
+	# try_files を自動で行う(存在しないパスは index.php へ)
+	php_server
+}

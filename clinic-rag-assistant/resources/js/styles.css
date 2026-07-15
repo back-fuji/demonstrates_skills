@@ -1,0 +1,183 @@
+/* SPA 全体の素朴なスタイル。医療/クリニック向けの落ち着いた配色。 */
+:root {
+    --c-bg: #f4f7f8;
+    --c-surface: #ffffff;
+    --c-border: #dde5e8;
+    --c-text: #23343b;
+    --c-muted: #6b7d85;
+    --c-primary: #2f8f83;      /* 落ち着いたティール */
+    --c-primary-dark: #256e65;
+    --c-accent: #eaf4f2;
+    --c-danger: #b4453c;
+    --c-good: #2f8f5f;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(35, 52, 59, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP',
+        'Segoe UI', Roboto, sans-serif;
+    color: var(--c-text);
+    background: var(--c-bg);
+    line-height: 1.65;
+}
+
+a {
+    color: var(--c-primary-dark);
+    text-decoration: none;
+}
+
+/* ---- レイアウト ---- */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+    box-shadow: var(--shadow);
+}
+
+.app-header .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--c-primary-dark);
+}
+
+.app-header .brand small {
+    font-weight: 400;
+    color: var(--c-muted);
+    font-size: 0.75rem;
+}
+
+.app-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.app-nav .router-link-active {
+    color: var(--c-primary-dark);
+    font-weight: 600;
+}
+
+.app-nav .who {
+    color: var(--c-muted);
+    font-size: 0.82rem;
+}
+
+.container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* ---- 汎用パーツ ---- */
+.card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin-bottom: 0.3rem;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    font: inherit;
+    color: var(--c-text);
+    background: #fff;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px var(--c-accent);
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.1rem;
+    background: var(--c-primary);
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+    background: var(--c-primary-dark);
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+button.ghost {
+    background: transparent;
+    color: var(--c-primary-dark);
+    border: 1px solid var(--c-border);
+}
+
+button.ghost:hover:not(:disabled) {
+    background: var(--c-accent);
+}
+
+button.small {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.error {
+    color: var(--c-danger);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.muted {
+    color: var(--c-muted);
+    font-size: 0.85rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--c-accent);
+    color: var(--c-primary-dark);
+}

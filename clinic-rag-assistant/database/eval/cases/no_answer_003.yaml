@@ -1,0 +1,6 @@
+question: "クリニックの駐車場は何台分ありますか?"
+category: no_answer
+expected_chunk_keys: []
+expected_answer_points:
+  - "駐車場の台数に関する記載は社内文書に存在しないため回答できないと伝える"
+  - "推測せず、該当する社内文書が見つからない旨を答える"

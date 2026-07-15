@@ -1,0 +1,7 @@
+question: "ダーマペンのダウンタイムはどのくらいですか?"
+category: fact
+expected_chunk_keys:
+  - "ダーマペン 施術マニュアル#ダウンタイム"
+expected_answer_points:
+  - "赤みが2〜3日続くことがある"
+  - "点状出血やかさつきが数日出る場合がある"

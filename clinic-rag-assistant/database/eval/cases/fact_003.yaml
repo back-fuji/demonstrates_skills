@@ -1,0 +1,6 @@
+question: "ボトックスの眉間の料金は?"
+category: fact
+expected_chunk_keys:
+  - "ボトックス注射 施術マニュアル#料金"
+expected_answer_points:
+  - "眉間は27,500円(税込)"

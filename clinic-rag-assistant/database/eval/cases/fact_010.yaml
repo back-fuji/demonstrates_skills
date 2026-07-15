@@ -1,0 +1,6 @@
+question: "脂肪溶解注射で特に注意すべきアレルギーは?"
+category: fact
+expected_chunk_keys:
+  - "脂肪溶解注射 施術マニュアル#禁忌・注意事項"
+expected_answer_points:
+  - "大豆アレルギー(製剤の関連成分による)"

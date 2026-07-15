@@ -1,0 +1,6 @@
+question: "日本国内の美容医療の市場規模は何億円ですか?"
+category: no_answer
+expected_chunk_keys: []
+expected_answer_points:
+  - "市場規模の統計は社内文書に存在しないため回答できないと伝える"
+  - "推測や外部知識で数値を捏造しない"

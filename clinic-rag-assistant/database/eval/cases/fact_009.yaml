@@ -1,0 +1,7 @@
+question: "しみ取りレーザーの後、保護テープはどのくらい貼りますか?"
+category: fact
+expected_chunk_keys:
+  - "しみ取りレーザー 施術マニュアル#術後ケア"
+expected_answer_points:
+  - "保護テープを1〜2週間貼付する"
+  - "患部をこすらず日焼け止めを徹底する"

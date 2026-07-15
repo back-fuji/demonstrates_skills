@@ -1,0 +1,8 @@
+question: "水光注射の禁忌を教えてください。"
+category: fact
+expected_chunk_keys:
+  - "水光注射 施術マニュアル#禁忌・注意事項"
+expected_answer_points:
+  - "妊娠中"
+  - "注射部位の感染・ケロイド体質"
+  - "抗凝固薬服用中は要相談"

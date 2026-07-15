@@ -1,0 +1,6 @@
+question: "他院のAクリニックの医療脱毛の料金はいくらですか?"
+category: no_answer
+expected_chunk_keys: []
+expected_answer_points:
+  - "他院の料金は社内文書に存在しないため回答できないと伝える"
+  - "推測せず、該当する社内文書が見つからない旨を答える"

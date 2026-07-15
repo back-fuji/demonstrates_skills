@@ -1,0 +1,6 @@
+question: "ケミカルピーリングのダウンタイムは?"
+category: fact
+expected_chunk_keys:
+  - "ケミカルピーリング 施術マニュアル#ダウンタイム"
+expected_answer_points:
+  - "軽い赤みと薄い皮むけが数日出ることがある"

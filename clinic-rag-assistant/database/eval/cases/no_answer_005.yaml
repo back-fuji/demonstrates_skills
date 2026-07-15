@@ -1,0 +1,6 @@
+question: "看護師の具体的な月給額はいくらですか?"
+category: no_answer
+expected_chunk_keys: []
+expected_answer_points:
+  - "具体的な給与額は社内文書(就業規則抜粋)に記載がないため回答できないと伝える"
+  - "推測で金額を答えない"

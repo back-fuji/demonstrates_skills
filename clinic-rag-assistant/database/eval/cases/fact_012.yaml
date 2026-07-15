@@ -1,0 +1,6 @@
+question: "イオン導入の料金はいくらですか?"
+category: fact
+expected_chunk_keys:
+  - "イオン導入 施術マニュアル#料金"
+expected_answer_points:
+  - "1回5,500円(税込、ビタミンC / トラネキサム酸)"

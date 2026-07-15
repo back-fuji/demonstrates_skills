@@ -1,0 +1,8 @@
+question: "スタッフの服装や身だしなみのルールは?"
+category: policy
+expected_chunk_keys:
+  - "就業規則抜粋(勤務・服装)#服装規定"
+expected_answer_points:
+  - "清潔な指定ユニフォームを着用する"
+  - "爪は短く、華美なネイル・アクセサリー・強い香水は不可"
+  - "長い髪はまとめる"
